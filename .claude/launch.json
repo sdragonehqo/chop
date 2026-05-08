@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "chop-status-server",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["server/server.js", "--port", "47823"],
+      "port": 47823
+    }
+  ]
+}

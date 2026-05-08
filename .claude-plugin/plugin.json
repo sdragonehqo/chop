@@ -1,0 +1,8 @@
+{
+  "name": "chop",
+  "description": "A cartoon lumberjack window that chops wood while your session runs. Gets visibly more exhausted as tokens and time pile up — but never slows down.",
+  "version": "0.1.0",
+  "author": {
+    "name": "sal"
+  }
+}

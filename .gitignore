@@ -1,0 +1,26 @@
+# Local Claude Code per-project settings (your own permissions, not portable)
+.claude/settings.local.json
+
+# Runtime files (live under ~/.claude/chop/, but in case anyone runs the
+# server from inside the repo)
+*.pid
+*.log
+.runtime/
+
+# OS clutter
+.DS_Store
+Thumbs.db
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Node (in case you switch to Electron later)
+node_modules/
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+dist/
+build/

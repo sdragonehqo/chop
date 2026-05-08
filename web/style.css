@@ -1,0 +1,416 @@
+/* chop — lumberjack window styles
+ *
+ * Visual language:
+ *   - Constant chop tempo (1s) regardless of exhaustion. NEVER tie animation
+ *     duration to the .t* class. Only swap visuals (sweat, eyes, posture,
+ *     color, bubble line, Z's) so the user sees "tired but still grinding."
+ */
+
+:root {
+  --chop-duration: 1s;
+  --bg: #1a1a1a;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background: var(--bg);
+  font-family: -apple-system, "Helvetica Neue", system-ui, sans-serif;
+  color: #eaeaea;
+  overflow: hidden;
+}
+
+.frame {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#scene {
+  width: min(96vmin, 720px);
+  height: min(96vmin, 720px);
+  filter: drop-shadow(0 12px 24px rgba(0,0,0,0.45));
+  transition: filter 1.2s ease;
+}
+
+/* ----- core animation -----
+ * Two stacked rotations build the chop:
+ *   #bend  rotates the upper body around the hip (subtle waist bend)
+ *   #swing rotates the arms+axe rigid unit around the chest pivot
+ * They share the same duration and start time so they stay in lockstep,
+ * and their motions COMPOUND for a chunky, weighted swing.
+ */
+
+#swing, #swing-back {
+  /* pivot at the chest center, matching the new body position (body
+     was shifted left by 20 via the body-static wrapper, so the chest
+     is now at world x=160). The #swing internals stay at original
+     world coords so the axe still reaches the stump at world x=240. */
+  transform-origin: 160px 254px;
+  animation: chop var(--chop-duration) infinite;
+}
+
+@keyframes chop {
+  /* anticipation: hangs back, then accelerates down */
+  0%   { transform: rotate(-110deg); animation-timing-function: cubic-bezier(.55,.05,.85,.2); }
+  /* impact: a tiny overshoot/snap so the head bites into the stump */
+  44%  { transform: rotate(4deg);    animation-timing-function: steps(1); }
+  46%  { transform: rotate(0deg);    animation-timing-function: cubic-bezier(.4,0,.55,1); }
+  /* recoil: small bounce back as the haft absorbs the impact */
+  56%  { transform: rotate(-8deg);   animation-timing-function: cubic-bezier(.3,.7,.5,1); }
+  /* recovery: ease back to windup, slower than the strike */
+  100% { transform: rotate(-110deg); }
+}
+
+/* posture wrapper — class-conditional STATIC hunch that adds to the
+ * (animated) chop bend. Tempo never changes; only the resting tilt of
+ * the upper body shifts as the lumberjack gets more wrecked. */
+#upper {
+  transform-origin: 160px 340px;
+  transition: transform 1.4s ease;
+  transform: rotate(0) translateY(0);
+}
+.t1 #upper { transform: rotate(1deg)  translateY(0.5px); }
+.t2 #upper { transform: rotate(2.5deg) translateY(1.5px); }
+.t3 #upper { transform: rotate(5deg)  translateY(3px); }
+.t4 #upper { transform: rotate(8deg)  translateY(5px); }
+
+/* head droop and tremble at high exhaustion. Origin shifts left with
+   the body-static wrapper (body shifted -20). */
+#head {
+  transform-origin: 162px 224px;
+  transition: transform 1s ease;
+}
+.t3 #head { transform: rotate(4deg) translateY(1px); }
+.t4 #head { transform: rotate(8deg) translateY(2px); animation: tremble 0.18s infinite; }
+@keyframes tremble {
+  0%, 100% { transform: rotate(8deg) translateY(2px) translateX(0); }
+  50%      { transform: rotate(8deg) translateY(2px) translateX(0.5px); }
+}
+
+/* upper-body bend at the hip — synced with the swing.
+ * A 2px translateY at impact gives a satisfying "thunk" of weight as the
+ * body absorbs the strike. Returns to 0 during the recovery. */
+#bend {
+  transform-origin: 160px 340px;
+  animation: bend var(--chop-duration) infinite;
+}
+@keyframes bend {
+  /* squash & stretch: a tiny scaleY makes the chop feel WEIGHTY without
+     changing the tempo. stretch on the way down (anticipation), squash at
+     impact (the body absorbs force), back to neutral on recovery. */
+  0%   { transform: rotate(-4deg) translateY(0)   scaleY(1);    animation-timing-function: cubic-bezier(.55,.05,.85,.2); }
+  40%  { transform: rotate(7deg)  translateY(2px) scaleY(1.02); animation-timing-function: steps(1); }
+  44%  { transform: rotate(9deg)  translateY(3px) scaleY(1.03); animation-timing-function: steps(1); }
+  46%  { transform: rotate(7deg)  translateY(4px) scaleY(0.96); animation-timing-function: cubic-bezier(.3,.7,.5,1); }
+  52%  { transform: rotate(5deg)  translateY(2px) scaleY(0.99); animation-timing-function: cubic-bezier(.4,0,.6,1); }
+  60%  { transform: rotate(-2deg) translateY(0)   scaleY(1);    animation-timing-function: cubic-bezier(.4,0,.6,1); }
+  100% { transform: rotate(-4deg) translateY(0)   scaleY(1); }
+}
+
+/* Legs absorb the strike with a tiny knee bend at impact. Static otherwise.
+   The translateY is small (1.5px) — enough to read as weight transfer
+   without unrooting the boots from the ground. */
+#legs {
+  /* impact pivot at the new body's foot-line (body shifted -20). */
+  transform-origin: 160px 408px;
+  animation: legs-impact var(--chop-duration) infinite;
+}
+@keyframes legs-impact {
+  0%, 38%, 60%, 100% { transform: translateY(0) scaleY(1); }
+  44% { transform: translateY(0) scaleY(1); }
+  46% { transform: translateY(1.5px) scaleY(0.985); }
+  52% { transform: translateY(0.5px) scaleY(0.995); }
+}
+
+/* ----- log on the stump — the chop target -----
+ * The whole log lives 0–44% of the cycle, vanishes at impact (46%), gets
+ * replaced by two tumbling halves (46–92%), and finally a fresh log
+ * drops in from above (85–100%) for the next swing. */
+#whole-log {
+  transform-origin: 240px 380px;
+  animation: log-life var(--chop-duration) infinite;
+}
+@keyframes log-life {
+  0%, 44%  { opacity: 1; transform: translate(0,0) rotate(0); }
+  /* split: instantly gone */
+  46%      { opacity: 0; transform: translate(0,0) rotate(0); }
+  /* still gone while the halves fly */
+  84%      { opacity: 0; transform: translate(0,-60px) rotate(8deg);
+             animation-timing-function: cubic-bezier(.4,.2,.7,1); }
+  /* drops into place */
+  93%      { opacity: 1; transform: translate(0,-14px) rotate(3deg);
+             animation-timing-function: cubic-bezier(.5,1.6,.7,1); }
+  100%     { opacity: 1; transform: translate(0,0) rotate(0); }
+}
+
+.log-half { opacity: 0; }
+#left-half  { transform-origin: 240px 380px;
+              animation: split-left  var(--chop-duration) infinite; }
+#right-half { transform-origin: 240px 380px;
+              animation: split-right var(--chop-duration) infinite; }
+
+/* Ballistic arcs: halves fly OUT + UP first, then fall under gravity,
+ * tumbling end-over-end. The translation is applied AFTER the rotation
+ * around the split point, so the rotation stays in-place while the
+ * translate moves the half outward. */
+@keyframes split-left {
+  0%, 45%  { opacity: 0; transform: translate(0,0) rotate(0); }
+  46%      { opacity: 1; transform: translate(-4px,-2px) rotate(-8deg);
+             animation-timing-function: cubic-bezier(.2,.55,.5,1); }
+  56%      { opacity: 1; transform: translate(-22px,-18px) rotate(-70deg); }
+  68%      { opacity: 1; transform: translate(-50px,-22px) rotate(-160deg); }
+  80%      { opacity: 1; transform: translate(-82px,-2px)  rotate(-240deg); }
+  92%      { opacity: 0; transform: translate(-118px,38px) rotate(-320deg); }
+  100%     { opacity: 0; }
+}
+@keyframes split-right {
+  0%, 45%  { opacity: 0; transform: translate(0,0) rotate(0); }
+  46%      { opacity: 1; transform: translate(4px,-2px) rotate(8deg);
+             animation-timing-function: cubic-bezier(.2,.55,.5,1); }
+  56%      { opacity: 1; transform: translate(28px,-20px) rotate(80deg); }
+  68%      { opacity: 1; transform: translate(64px,-24px) rotate(180deg); }
+  80%      { opacity: 1; transform: translate(108px,0px)  rotate(260deg); }
+  92%      { opacity: 0; transform: translate(150px,42px) rotate(340deg); }
+  100%     { opacity: 0; }
+}
+
+/* wood chip burst — chips appear at impact and fly outward, then fade.
+   The impact point is the cutting-edge tip at world (240, 392), where the
+   T-mounted blade bites into the top of the log on the stump. */
+#chips { transform: translate(240px, 392px); }
+
+/* impact flash: a white ring that pops at the strike, then expands and fades.
+ * Sells the "thunk" without dominating the scene. */
+#impact-flash {
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: impact-flash var(--chop-duration) infinite;
+}
+@keyframes impact-flash {
+  0%, 44%  { opacity: 0; transform: scale(0.4); }
+  46%      { opacity: 0.85; transform: scale(1);
+             animation-timing-function: cubic-bezier(.4,0,.7,1); }
+  56%      { opacity: 0; transform: scale(2.4); }
+  100%     { opacity: 0; }
+}
+
+/* dust puff: gray clouds that bloom outward at impact */
+.puff {
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: puff-bloom var(--chop-duration) infinite;
+}
+.puff:nth-of-type(2) { animation-delay: -0.02s; }
+.puff:nth-of-type(3) { animation-delay: -0.04s; }
+.puff:nth-of-type(4) { animation-delay: -0.06s; }
+@keyframes puff-bloom {
+  0%, 44%  { opacity: 0;   transform: scale(0.3); }
+  46%      { opacity: 0.7; transform: scale(0.5);
+             animation-timing-function: cubic-bezier(.3,0,.7,1); }
+  62%      { opacity: 0.45; transform: scale(1.6); }
+  82%      { opacity: 0;   transform: scale(2.6); }
+  100%     { opacity: 0; }
+}
+.chip {
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: chip-burst var(--chop-duration) infinite;
+}
+@keyframes chip-burst {
+  0%, 43% { opacity: 0; transform: translate(0,0) rotate(0) scale(0.4); }
+  46%     { opacity: 1; transform: translate(0,0) rotate(0) scale(0.7); }
+  62%     { opacity: 0.8; transform: translate(var(--cx), var(--cy)) rotate(var(--rot)) scale(0.9); }
+  75%     { opacity: 0; transform: translate(var(--cx), calc(var(--cy) + 12px)) rotate(var(--rot)) scale(0.9); }
+  100%    { opacity: 0; }
+}
+
+/* ----- speech bubble ----- */
+#bubble {
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+.t1 #bubble, .t2 #bubble, .t3 #bubble, .t4 #bubble {
+  opacity: 1;
+  transform: translateY(0);
+}
+#bubble-text {
+  font-family: "Patrick Hand", "Comic Sans MS", "Marker Felt", "Chalkboard SE", sans-serif;
+  font-size: 24px;
+  font-weight: 400;
+  fill: #1A1A1A;
+  letter-spacing: 0.01em;
+}
+
+/* ----- log pile reveal: only logs with data-i <= --logs are shown ----- */
+#log-pile { --logs: 0; }
+#log-pile .log {
+  opacity: 0;
+  transform: translateY(8px) scale(0.8);
+  transform-box: fill-box;
+  transform-origin: center bottom;
+  transition: opacity 0.4s ease, transform 0.5s cubic-bezier(.2,1.4,.6,1);
+}
+/* Use attr-based reveal: a CSS rule per index, gated by the --logs custom property.
+   Trick: the :where() with @container would be cleaner, but we keep it simple — JS
+   toggles a `.show` class on each log instead. */
+#log-pile .log.show {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+/* ----- HUD overlay ----- */
+#hud {
+  position: absolute;
+  left: 16px;
+  bottom: 14px;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 11px;
+  color: #bcbcbc;
+  letter-spacing: 0.02em;
+  user-select: none;
+}
+#hud .bar {
+  width: 200px;
+  height: 5px;
+  border-radius: 3px;
+  background: rgba(255,255,255,0.08);
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+#bar-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #6BCB77, #FFD93D 50%, #FF6B6B);
+  transition: width 0.6s ease;
+}
+#hud .meta .dot { opacity: 0.5; margin: 0 4px; }
+#hud .meta #m-mood { font-style: italic; }
+
+/* test-mode buttons: click to force an exhaustion stage. "auto" returns
+   control to the live poller. */
+#test-controls {
+  margin-top: 8px;
+  display: flex;
+  gap: 4px;
+}
+#test-controls button {
+  background: rgba(255,255,255,0.05);
+  color: #9a9a9a;
+  border: 1px solid rgba(255,255,255,0.12);
+  padding: 3px 8px;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  border-radius: 3px;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+#test-controls button:hover {
+  background: rgba(255,255,255,0.12);
+  color: #eaeaea;
+}
+#test-controls button.active {
+  background: rgba(255,255,255,0.22);
+  color: #fff;
+  border-color: rgba(255,255,255,0.32);
+}
+
+/* ============================================================
+ * exhaustion stages — purely cosmetic. tempo never changes.
+ * ============================================================ */
+
+/* default (.t0): everything fresh, sweat & extras hidden */
+#sweat, .eyebags, .mouth-pant, .tongue, .tongue-hi, #zzz, .lid { opacity: 0; }
+.mouth-smile { opacity: 1; }
+
+/* t1: warming up — first sweat drop, brows slightly down */
+.t1 #sweat .d1 { opacity: 1; animation: drip 1.4s infinite; }
+.t1 .brow { transform: translateY(0.5px); transform-box: fill-box; }
+
+/* t2: working hard — more sweat, eyebags, neutral mouth */
+.t2 #sweat .d1,
+.t2 #sweat .d2 { opacity: 1; animation: drip 1.3s infinite; }
+.t2 #sweat .d2 { animation-delay: 0.4s; }
+.t2 .eyebags { opacity: 0.8; }
+.t2 .mouth-smile { opacity: 0; }
+.t2 .mouth-pant  { opacity: 0.6; }
+.t2 #scene { filter: drop-shadow(0 12px 24px rgba(0,0,0,0.45)) saturate(0.9); }
+
+/* t3: exhausted — droopy eyes, panting mouth, body sags, color desaturates */
+.t3 #sweat .drop { opacity: 1; animation: drip 1.2s infinite; }
+.t3 #sweat .d2 { animation-delay: 0.35s; }
+.t3 #sweat .d3 { animation-delay: 0.7s; }
+.t3 .eyebags { opacity: 1; }
+.t3 .mouth-smile { opacity: 0; }
+.t3 .mouth-pant  { opacity: 1; }
+.t3 .lid { opacity: 1; height: 5px; transition: height 0.6s ease; }
+.t3 .brow { transform: translateY(2px); transform-box: fill-box; }
+.t3 #lumberjack { transform: translateY(3px); }
+.t3 #scene { filter: drop-shadow(0 12px 24px rgba(0,0,0,0.45)) saturate(0.7); }
+
+/* t4: dead-tired — tongue out, eyes nearly shut, Z's, sweat puddle, beanie pom slipping */
+.t4 #sweat .drop { opacity: 1; animation: drip 1.0s infinite; }
+.t4 #sweat .d2 { animation-delay: 0.3s; }
+.t4 #sweat .d3 { animation-delay: 0.6s; }
+.t4 .eyebags { opacity: 1; }
+.t4 .mouth-smile { opacity: 0; }
+.t4 .mouth-pant  { opacity: 1; }
+.t4 .tongue, .t4 .tongue-hi { opacity: 1; }
+.t4 .lid { opacity: 1; height: 8px; }
+.t4 .brow { transform: translateY(3px); transform-box: fill-box; }
+.t4 #lumberjack { transform: translateY(5px); }
+.t4 #zzz { opacity: 1; }
+.t4 #zzz .z { animation: float-z 2.4s infinite; }
+.t4 #zzz .z2 { animation-delay: 0.8s; }
+.t4 #zzz .z3 { animation-delay: 1.6s; }
+.t4 #puddle { opacity: 0.55; animation: puddle-pulse 2.5s infinite; }
+.t4 #scene { filter: drop-shadow(0 12px 24px rgba(0,0,0,0.45)) saturate(0.55) brightness(0.95); }
+/* beanie pom slips down — cute */
+.t4 #head circle:last-of-type { transform: translate(6px, 8px) rotate(8deg); transform-box: fill-box; }
+
+/* ----- helper animations ----- */
+
+@keyframes drip {
+  0%   { transform: translateY(0); opacity: 0.2; }
+  20%  { opacity: 1; }
+  100% { transform: translateY(28px); opacity: 0; }
+}
+
+#sweat .drop {
+  transform-box: fill-box;
+  transform-origin: center top;
+}
+
+#zzz .z {
+  font-family: "Comic Sans MS", "Marker Felt", sans-serif;
+  font-weight: 800;
+  fill: #4a4a4a;
+  font-size: 22px;
+  opacity: 0;
+}
+@keyframes float-z {
+  0%   { opacity: 0; transform: translate(0, 0) scale(0.6); }
+  20%  { opacity: 0.95; }
+  100% { opacity: 0; transform: translate(8px, -28px) scale(1.2); }
+}
+#zzz .z {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+@keyframes puddle-pulse {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.05); }
+}
+#puddle { transform-box: fill-box; transform-origin: center; }

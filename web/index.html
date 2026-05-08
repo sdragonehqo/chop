@@ -1,0 +1,710 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>chop</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body class="t0">
+  <div class="frame">
+    <svg id="scene" viewBox="0 0 480 480" preserveAspectRatio="xMidYMid meet" aria-label="lumberjack chopping wood">
+      <defs>
+        <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"  stop-color="#88C4E8" />
+          <stop offset="60%" stop-color="#C8E4F0" />
+          <stop offset="100%" stop-color="#E9D9B8" />
+        </linearGradient>
+        <linearGradient id="ground" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#7BAE5C" />
+          <stop offset="100%" stop-color="#5A8C42" />
+        </linearGradient>
+        <radialGradient id="sun" cx="50%" cy="50%" r="50%">
+          <stop offset="0%"   stop-color="#FFFAEC" />
+          <stop offset="35%"  stop-color="#FFE9A8" />
+          <stop offset="65%"  stop-color="#FFD680" stop-opacity="0.85" />
+          <stop offset="100%" stop-color="#FFB958" stop-opacity="0" />
+        </radialGradient>
+        <pattern id="plaid" width="14" height="14" patternUnits="userSpaceOnUse">
+          <rect width="14" height="14" fill="#C0392B"/>
+          <rect width="14" height="3"  y="0" fill="#8E2A20" opacity="0.55"/>
+          <rect width="3"  height="14" x="0" fill="#8E2A20" opacity="0.55"/>
+          <rect width="14" height="1"  y="6" fill="#F4D6CE" opacity="0.4"/>
+          <rect width="1"  height="14" x="6" fill="#F4D6CE" opacity="0.4"/>
+        </pattern>
+      </defs>
+
+      <!-- background -->
+      <rect width="480" height="480" fill="url(#sky)"/>
+      <!-- sun: soft glow + bright core -->
+      <circle id="sun-disk" cx="380" cy="100" r="56" fill="url(#sun)"/>
+      <circle cx="380" cy="100" r="22" fill="#FFFAEC" opacity="0.92"/>
+
+      <!-- distant pines: each tree gets a darker shadow side, a layered
+           silhouette of inner foliage scallops, and a brown trunk peeking
+           below. Reads as real conifers, not flag-football cones. -->
+      <g id="trees">
+        <!-- back-left small pine -->
+        <g opacity="0.7">
+          <rect x="17" y="356" width="6" height="10" fill="#4A2E18"/>
+          <path d="M-10 360 L20 270 L50 360 Z" fill="#3F6B4A"/>
+          <path d="M20 270 L50 360 L20 360 Z" fill="#2C4F35"/>
+          <path d="M5 320 Q20 305 35 320" fill="none" stroke="#2C4F35" stroke-width="0.8" opacity="0.6"/>
+        </g>
+        <!-- left tree -->
+        <g>
+          <rect x="67" y="354" width="6" height="12" fill="#4A2E18"/>
+          <path d="M40 360 L70 250 L100 360 Z" fill="#3F6B4A"/>
+          <path d="M70 250 L100 360 L70 360 Z" fill="#2C4F35"/>
+          <path d="M55 310 Q70 295 85 310" fill="none" stroke="#2C4F35" stroke-width="0.9" opacity="0.6"/>
+          <path d="M52 335 Q70 320 88 335" fill="none" stroke="#2C4F35" stroke-width="0.9" opacity="0.6"/>
+        </g>
+        <!-- left-foreground tree (taller) -->
+        <g opacity="0.92">
+          <rect x="117" y="354" width="6" height="12" fill="#4A2E18"/>
+          <path d="M85 360 L120 230 L155 360 Z" fill="#3F6B4A"/>
+          <path d="M120 230 L155 360 L120 360 Z" fill="#2C4F35"/>
+          <path d="M100 290 Q120 275 140 290" fill="none" stroke="#2C4F35" stroke-width="0.9" opacity="0.6"/>
+          <path d="M95 320 Q120 305 145 320" fill="none" stroke="#2C4F35" stroke-width="0.9" opacity="0.6"/>
+        </g>
+        <!-- right tree -->
+        <g opacity="0.92">
+          <rect x="362" y="354" width="6" height="12" fill="#4A2E18"/>
+          <path d="M330 360 L365 240 L400 360 Z" fill="#3F6B4A"/>
+          <path d="M365 240 L400 360 L365 360 Z" fill="#2C4F35"/>
+          <path d="M345 295 Q365 280 385 295" fill="none" stroke="#2C4F35" stroke-width="0.9" opacity="0.6"/>
+          <path d="M340 325 Q365 310 390 325" fill="none" stroke="#2C4F35" stroke-width="0.9" opacity="0.6"/>
+        </g>
+        <!-- right-back tree -->
+        <g>
+          <rect x="417" y="354" width="6" height="12" fill="#4A2E18"/>
+          <path d="M385 360 L420 260 L455 360 Z" fill="#3F6B4A"/>
+          <path d="M420 260 L455 360 L420 360 Z" fill="#2C4F35"/>
+          <path d="M398 315 Q420 300 442 315" fill="none" stroke="#2C4F35" stroke-width="0.9" opacity="0.6"/>
+        </g>
+      </g>
+
+      <!-- ground -->
+      <rect x="0" y="355" width="480" height="125" fill="url(#ground)"/>
+      <!-- soft trampled-dirt ring around the stump only -->
+      <ellipse cx="240" cy="420" rx="58" ry="7" fill="#7A5A3C" opacity="0.45"/>
+      <!-- working area shadow under the lumberjack's feet (body shifted -20) -->
+      <ellipse cx="160" cy="424" rx="50" ry="5" fill="#000" opacity="0.18"/>
+
+      <!-- sweat puddle on the ground (only at high exhaustion) -->
+      <ellipse id="puddle" cx="160" cy="424" rx="46" ry="5" fill="#7EC8E3" opacity="0"/>
+
+      <!-- Log pile (right of stump). Logs are drawn END-GRAIN-FORWARD —
+           you're looking at the freshly cut faces, like a real firewood
+           stack. Trigonally close-packed in a 4-3-1 pyramid (8 max).
+           Each log reveals one-by-one as the user piles up prompts. -->
+      <g id="log-pile">
+        <!-- shared ground patch under the pile -->
+        <ellipse cx="362" cy="436" rx="62" ry="7" fill="#5C3A1E" opacity="0.35"/>
+
+        <!-- ROW 1 — bottom (y=420), 4 logs -->
+        <g class="log" data-i="1"><g transform="translate(320 420) rotate(-3)">
+          <ellipse cx="0" cy="0" rx="14" ry="13" fill="#5C3A1E"/>
+          <ellipse cx="0" cy="0" rx="12" ry="11" fill="#C8916A"/>
+          <ellipse cx="0" cy="0" rx="9"  ry="8"  fill="none" stroke="#8B5A3C" stroke-width="0.7"/>
+          <ellipse cx="0" cy="0" rx="6"  ry="5"  fill="none" stroke="#8B5A3C" stroke-width="0.6"/>
+          <ellipse cx="0" cy="0" rx="3"  ry="2.5" fill="none" stroke="#8B5A3C" stroke-width="0.5"/>
+          <circle  cx="0" cy="0" r="1.2" fill="#5C3A1E"/>
+          <path d="M-9 -5 Q-5 -9 1 -9" fill="none" stroke="#E8C8A0" stroke-width="0.8" opacity="0.55"/>
+        </g></g>
+        <g class="log" data-i="2"><g transform="translate(348 420) rotate(2)">
+          <ellipse cx="0" cy="0" rx="14" ry="13" fill="#5C3A1E"/>
+          <ellipse cx="0" cy="0" rx="12" ry="11" fill="#B07F5A"/>
+          <ellipse cx="0" cy="0" rx="9"  ry="8"  fill="none" stroke="#7A4F2B" stroke-width="0.7"/>
+          <ellipse cx="0" cy="0" rx="6"  ry="5"  fill="none" stroke="#7A4F2B" stroke-width="0.6"/>
+          <ellipse cx="0" cy="0" rx="3"  ry="2.5" fill="none" stroke="#7A4F2B" stroke-width="0.5"/>
+          <circle  cx="0" cy="0" r="1.2" fill="#5C3A1E"/>
+          <path d="M-9 -5 Q-5 -9 1 -9" fill="none" stroke="#E8C8A0" stroke-width="0.8" opacity="0.5"/>
+        </g></g>
+        <g class="log" data-i="3"><g transform="translate(376 420) rotate(-1)">
+          <ellipse cx="0" cy="0" rx="14" ry="13" fill="#5C3A1E"/>
+          <ellipse cx="0" cy="0" rx="12" ry="11" fill="#C8916A"/>
+          <ellipse cx="0" cy="0" rx="9"  ry="8"  fill="none" stroke="#8B5A3C" stroke-width="0.7"/>
+          <ellipse cx="0" cy="0" rx="6"  ry="5"  fill="none" stroke="#8B5A3C" stroke-width="0.6"/>
+          <ellipse cx="0" cy="0" rx="3"  ry="2.5" fill="none" stroke="#8B5A3C" stroke-width="0.5"/>
+          <circle  cx="0" cy="0" r="1.2" fill="#5C3A1E"/>
+          <path d="M-9 -5 Q-5 -9 1 -9" fill="none" stroke="#E8C8A0" stroke-width="0.8" opacity="0.55"/>
+        </g></g>
+        <g class="log" data-i="4"><g transform="translate(404 420) rotate(4)">
+          <ellipse cx="0" cy="0" rx="14" ry="13" fill="#5C3A1E"/>
+          <ellipse cx="0" cy="0" rx="12" ry="11" fill="#B07F5A"/>
+          <ellipse cx="0" cy="0" rx="9"  ry="8"  fill="none" stroke="#7A4F2B" stroke-width="0.7"/>
+          <ellipse cx="0" cy="0" rx="6"  ry="5"  fill="none" stroke="#7A4F2B" stroke-width="0.6"/>
+          <ellipse cx="0" cy="0" rx="3"  ry="2.5" fill="none" stroke="#7A4F2B" stroke-width="0.5"/>
+          <circle  cx="0" cy="0" r="1.2" fill="#5C3A1E"/>
+          <path d="M-9 -5 Q-5 -9 1 -9" fill="none" stroke="#E8C8A0" stroke-width="0.8" opacity="0.5"/>
+        </g></g>
+
+        <!-- ROW 2 — middle (y=396), 3 logs nestled in the valleys -->
+        <g class="log" data-i="5"><g transform="translate(334 396) rotate(2)">
+          <ellipse cx="0" cy="0" rx="14" ry="13" fill="#5C3A1E"/>
+          <ellipse cx="0" cy="0" rx="12" ry="11" fill="#C8916A"/>
+          <ellipse cx="0" cy="0" rx="9"  ry="8"  fill="none" stroke="#8B5A3C" stroke-width="0.7"/>
+          <ellipse cx="0" cy="0" rx="6"  ry="5"  fill="none" stroke="#8B5A3C" stroke-width="0.6"/>
+          <ellipse cx="0" cy="0" rx="3"  ry="2.5" fill="none" stroke="#8B5A3C" stroke-width="0.5"/>
+          <circle  cx="0" cy="0" r="1.2" fill="#5C3A1E"/>
+          <path d="M-9 -5 Q-5 -9 1 -9" fill="none" stroke="#E8C8A0" stroke-width="0.8" opacity="0.55"/>
+        </g></g>
+        <g class="log" data-i="6"><g transform="translate(362 396) rotate(-2)">
+          <ellipse cx="0" cy="0" rx="14" ry="13" fill="#5C3A1E"/>
+          <ellipse cx="0" cy="0" rx="12" ry="11" fill="#B07F5A"/>
+          <ellipse cx="0" cy="0" rx="9"  ry="8"  fill="none" stroke="#7A4F2B" stroke-width="0.7"/>
+          <ellipse cx="0" cy="0" rx="6"  ry="5"  fill="none" stroke="#7A4F2B" stroke-width="0.6"/>
+          <ellipse cx="0" cy="0" rx="3"  ry="2.5" fill="none" stroke="#7A4F2B" stroke-width="0.5"/>
+          <circle  cx="0" cy="0" r="1.2" fill="#5C3A1E"/>
+          <path d="M-9 -5 Q-5 -9 1 -9" fill="none" stroke="#E8C8A0" stroke-width="0.8" opacity="0.5"/>
+        </g></g>
+        <g class="log" data-i="7"><g transform="translate(390 396) rotate(3)">
+          <ellipse cx="0" cy="0" rx="14" ry="13" fill="#5C3A1E"/>
+          <ellipse cx="0" cy="0" rx="12" ry="11" fill="#C8916A"/>
+          <ellipse cx="0" cy="0" rx="9"  ry="8"  fill="none" stroke="#8B5A3C" stroke-width="0.7"/>
+          <ellipse cx="0" cy="0" rx="6"  ry="5"  fill="none" stroke="#8B5A3C" stroke-width="0.6"/>
+          <ellipse cx="0" cy="0" rx="3"  ry="2.5" fill="none" stroke="#8B5A3C" stroke-width="0.5"/>
+          <circle  cx="0" cy="0" r="1.2" fill="#5C3A1E"/>
+          <path d="M-9 -5 Q-5 -9 1 -9" fill="none" stroke="#E8C8A0" stroke-width="0.8" opacity="0.55"/>
+        </g></g>
+
+        <!-- ROW 3 — crown log on top of the pyramid -->
+        <g class="log" data-i="8"><g transform="translate(362 372) rotate(-5)">
+          <ellipse cx="0" cy="0" rx="13" ry="12" fill="#5C3A1E"/>
+          <ellipse cx="0" cy="0" rx="11" ry="10" fill="#C8916A"/>
+          <ellipse cx="0" cy="0" rx="8"  ry="7"  fill="none" stroke="#8B5A3C" stroke-width="0.7"/>
+          <ellipse cx="0" cy="0" rx="5"  ry="4"  fill="none" stroke="#8B5A3C" stroke-width="0.6"/>
+          <ellipse cx="0" cy="0" rx="2"  ry="1.5" fill="none" stroke="#8B5A3C" stroke-width="0.5"/>
+          <circle  cx="0" cy="0" r="1" fill="#5C3A1E"/>
+          <path d="M-8 -4 Q-4 -8 1 -8" fill="none" stroke="#E8C8A0" stroke-width="0.8" opacity="0.55"/>
+        </g></g>
+      </g>
+
+      <!-- stump: trunk side with vertical bark grain, moss patch, and
+           the rings on the freshly-cut top. -->
+      <g id="stump">
+        <!-- trunk -->
+        <path d="M222 388 Q220 432 240 432 Q260 432 258 388 Z" fill="#6B4423"
+              stroke="#3F2614" stroke-width="0.8" stroke-linejoin="round"/>
+        <!-- bark grain (subtle vertical wisps along the trunk) -->
+        <path d="M226 392 Q225 412 227 428" fill="none" stroke="#3F2614" stroke-width="0.8" opacity="0.55"/>
+        <path d="M232 392 Q231 410 233 430" fill="none" stroke="#3F2614" stroke-width="0.7" opacity="0.45"/>
+        <path d="M240 393 Q240 411 241 430" fill="none" stroke="#3F2614" stroke-width="0.8" opacity="0.55"/>
+        <path d="M248 392 Q249 412 250 430" fill="none" stroke="#3F2614" stroke-width="0.7" opacity="0.45"/>
+        <path d="M254 392 Q254 410 255 430" fill="none" stroke="#3F2614" stroke-width="0.8" opacity="0.5"/>
+        <!-- bark knot/scar -->
+        <ellipse cx="234" cy="408" rx="2.5" ry="3.5" fill="#3F2614" opacity="0.55"/>
+        <!-- moss patch on the side -->
+        <ellipse cx="248" cy="416" rx="7" ry="3.5" fill="#7BAE5C" opacity="0.7"/>
+        <ellipse cx="250" cy="417" rx="3" ry="1.6" fill="#5A8C42"/>
+        <!-- top surface (the cut face) -->
+        <ellipse cx="240" cy="388" rx="36" ry="10" fill="#8B5A3C"
+                 stroke="#3F2614" stroke-width="0.8"/>
+        <ellipse cx="240" cy="386" rx="30" ry="8" fill="#A5754F"/>
+        <ellipse cx="240" cy="385" rx="22" ry="5.5" fill="none" stroke="#6B4423" stroke-width="0.8"/>
+        <ellipse cx="240" cy="385" rx="14" ry="3.5" fill="none" stroke="#6B4423" stroke-width="0.8"/>
+        <ellipse cx="240" cy="385" rx="6"  ry="1.8" fill="none" stroke="#6B4423" stroke-width="0.8"/>
+      </g>
+
+      <!-- log on the stump — the actual target of every chop.
+           Lifecycle (synced to the 1s chop animation):
+             0%  – 44%  whole log sits on the stump
+             46%        log instantly disappears, two halves spawn at center
+             46% – 90%  halves tumble outward and fall, fading out
+             85% – 100% a fresh whole log drops in from above for the next chop -->
+      <g id="log-on-stump">
+        <!-- WHOLE LOG (intact) -->
+        <g id="whole-log">
+          <!-- side body -->
+          <rect x="205" y="370" width="70" height="20" rx="5" fill="#8B5A3C"/>
+          <!-- top highlight -->
+          <rect x="207" y="370" width="66" height="3.5" rx="2" fill="#A07248"/>
+          <!-- bottom shadow -->
+          <rect x="207" y="386" width="66" height="4" rx="2" fill="#5C3A1E"/>
+          <!-- bark wisps -->
+          <path d="M214 376 Q230 374 248 376" stroke="#5C3A1E" stroke-width="0.5" fill="none" opacity="0.45"/>
+          <path d="M218 384 Q236 382 258 384" stroke="#5C3A1E" stroke-width="0.5" fill="none" opacity="0.45"/>
+          <path d="M226 380 L242 380" stroke="#A07248" stroke-width="0.4" opacity="0.5"/>
+          <!-- LEFT end face: cream wood with concentric rings -->
+          <ellipse cx="205" cy="380" rx="7"   ry="10" fill="#C8916A"/>
+          <ellipse cx="205" cy="380" rx="5"   ry="7"  fill="none" stroke="#8B5A3C" stroke-width="0.6"/>
+          <ellipse cx="205" cy="380" rx="3"   ry="4.2" fill="none" stroke="#8B5A3C" stroke-width="0.5"/>
+          <ellipse cx="205" cy="380" rx="1"   ry="1.5" fill="#8B5A3C"/>
+          <!-- RIGHT end face -->
+          <ellipse cx="275" cy="380" rx="7"   ry="10" fill="#C8916A"/>
+          <ellipse cx="275" cy="380" rx="5"   ry="7"  fill="none" stroke="#8B5A3C" stroke-width="0.6"/>
+          <ellipse cx="275" cy="380" rx="3"   ry="4.2" fill="none" stroke="#8B5A3C" stroke-width="0.5"/>
+          <ellipse cx="275" cy="380" rx="1"   ry="1.5" fill="#8B5A3C"/>
+        </g>
+
+        <!-- LEFT HALF (rounded on the bark side, jagged on the split side) -->
+        <g id="left-half" class="log-half">
+          <path d="M210 370 L240 370 L240 390 L210 390 Q205 390 205 385 L205 375 Q205 370 210 370 Z"
+                fill="#8B5A3C"/>
+          <rect x="207" y="370" width="33" height="3.5" rx="2" fill="#A07248"/>
+          <rect x="207" y="386" width="33" height="4"   rx="2" fill="#5C3A1E"/>
+          <ellipse cx="205" cy="380" rx="7"   ry="10" fill="#C8916A"/>
+          <ellipse cx="205" cy="380" rx="5"   ry="7"  fill="none" stroke="#8B5A3C" stroke-width="0.6"/>
+          <ellipse cx="205" cy="380" rx="3"   ry="4.2" fill="none" stroke="#8B5A3C" stroke-width="0.5"/>
+          <!-- jagged split face (fresh, lighter wood) -->
+          <path d="M240 370 L237 374 L240 378 L237 382 L240 386 L237 390 L240 390 Z"
+                fill="#D4A77A" stroke="#A07248" stroke-width="0.4"/>
+        </g>
+
+        <!-- RIGHT HALF -->
+        <g id="right-half" class="log-half">
+          <path d="M270 370 L240 370 L240 390 L270 390 Q275 390 275 385 L275 375 Q275 370 270 370 Z"
+                fill="#8B5A3C"/>
+          <rect x="240" y="370" width="33" height="3.5" rx="2" fill="#A07248"/>
+          <rect x="240" y="386" width="33" height="4"   rx="2" fill="#5C3A1E"/>
+          <ellipse cx="275" cy="380" rx="7"   ry="10" fill="#C8916A"/>
+          <ellipse cx="275" cy="380" rx="5"   ry="7"  fill="none" stroke="#8B5A3C" stroke-width="0.6"/>
+          <ellipse cx="275" cy="380" rx="3"   ry="4.2" fill="none" stroke="#8B5A3C" stroke-width="0.5"/>
+          <path d="M240 370 L243 374 L240 378 L243 382 L240 386 L243 390 L240 390 Z"
+                fill="#D4A77A" stroke="#A07248" stroke-width="0.4"/>
+        </g>
+      </g>
+
+      <!-- impact effects burst (on impact). Whole group positioned at the
+           blade impact point via CSS. Three layers:
+             - dust puff (large translucent gray clouds expanding)
+             - chips (chunky wood splinters fanning outward)
+             - flash ring (sharp white pop at the strike) -->
+      <g id="chips">
+        <!-- dust puff: 3 overlapping circles that expand and fade -->
+        <circle class="puff" cx="-6" cy="-4" r="9"  fill="#D4C8B8"/>
+        <circle class="puff" cx="9"  cy="-3" r="10" fill="#C4B8A8"/>
+        <circle class="puff" cx="-2" cy="-12" r="7"  fill="#E0D4C0"/>
+        <circle class="puff" cx="14" cy="-12" r="6"  fill="#C8B8A0"/>
+
+        <!-- impact flash: bright ring at the moment of strike -->
+        <circle id="impact-flash" cx="0" cy="-4" r="8" fill="#FFFAEC"/>
+
+        <!-- chunky wood chips, bigger + bolder -->
+        <rect class="chip" x="-4" y="-2" width="8" height="4" rx="1.5" fill="#C8916A" stroke="#5C3A1E" stroke-width="0.5" style="--cx:-50px;--cy:-30px;--rot:-160deg"/>
+        <rect class="chip" x="-4" y="-2" width="7" height="3" rx="1.5" fill="#A5754F" stroke="#5C3A1E" stroke-width="0.5" style="--cx:-26px;--cy:-44px;--rot:-80deg"/>
+        <rect class="chip" x="-4" y="-2" width="9" height="4" rx="1.5" fill="#D4A77A" stroke="#5C3A1E" stroke-width="0.5" style="--cx:-8px;--cy:-50px;--rot:30deg"/>
+        <rect class="chip" x="-4" y="-2" width="8" height="3" rx="1.5" fill="#C8916A" stroke="#5C3A1E" stroke-width="0.5" style="--cx:18px;--cy:-46px;--rot:120deg"/>
+        <rect class="chip" x="-4" y="-2" width="7" height="3" rx="1.5" fill="#A5754F" stroke="#5C3A1E" stroke-width="0.5" style="--cx:38px;--cy:-34px;--rot:200deg"/>
+        <rect class="chip" x="-4" y="-2" width="6" height="3" rx="1.5" fill="#8B5A3C" stroke="#5C3A1E" stroke-width="0.5" style="--cx:54px;--cy:-14px;--rot:260deg"/>
+        <rect class="chip" x="-4" y="-2" width="7" height="3" rx="1.5" fill="#D4A77A" stroke="#5C3A1E" stroke-width="0.5" style="--cx:-36px;--cy:-10px;--rot:-220deg"/>
+        <rect class="chip" x="-4" y="-2" width="5" height="3" rx="1.5" fill="#A07248" stroke="#5C3A1E" stroke-width="0.5" style="--cx:8px;--cy:-36px;--rot:-300deg"/>
+      </g>
+
+      <!-- lumberjack -->
+      <g id="lumberjack">
+        <!-- legs: RAYMAN-STYLE floating boots. No jeans connecting the
+             torso to the boots — each boot is its own island in space.
+             The boots still take the impact "thunk" via #legs animation,
+             but visually they're disconnected from the body. -->
+        <g id="legs">
+          <!-- LEFT (back) boot — shifted -38 in x; pulls left to widen the
+               stance. Combined with the front boot now at -2, there's a
+               visible gap between the two feet. -->
+          <path d="M116 406 L144 406 Q148 408 148 414 L148 420 Q148 424 144 424 L118 424 Q110 424 108 418 L108 412 Q108 406 116 406 Z"
+                fill="#3B2616" stroke="#1B0F08" stroke-width="0.9" stroke-linejoin="round"/>
+          <path d="M108 419 L122 419 L122 426 Q122 428 120 428 L110 428 Q108 428 108 426 Z"
+                fill="#1B0F08"/>
+          <path d="M127 410 L134 416 M127 416 L134 410" stroke="#A07248" stroke-width="0.8"/>
+          <path d="M127 416 L134 422 M127 422 L134 416" stroke="#A07248" stroke-width="0.8"/>
+          <path d="M140 412 Q146 414 146 420" fill="none" stroke="#1B0F08" stroke-width="0.8"/>
+
+          <!-- RIGHT (front) boot — shifted -2 in x; mostly stays put while
+               the back boot pulls left, opening up the stance. -->
+          <path d="M180 406 L208 406 Q212 408 212 414 L212 420 Q212 424 208 424 L182 424 Q174 424 172 418 L172 412 Q172 406 180 406 Z"
+                fill="#3B2616" stroke="#1B0F08" stroke-width="0.9" stroke-linejoin="round"/>
+          <path d="M172 419 L186 419 L186 426 Q186 428 184 428 L174 428 Q172 428 172 426 Z"
+                fill="#1B0F08"/>
+          <path d="M191 410 L198 416 M191 416 L198 410" stroke="#A07248" stroke-width="0.8"/>
+          <path d="M191 416 L198 422 M191 422 L198 416" stroke="#A07248" stroke-width="0.8"/>
+          <path d="M204 412 Q210 414 210 420" fill="none" stroke="#1B0F08" stroke-width="0.8"/>
+        </g>
+
+        <!-- POSTURE wrapper: a STATIC tilt that increases with exhaustion
+             stage. Composes on top of the (animated) chop bend so a tired
+             lumberjack visibly hunches forward without the chop tempo
+             changing. Class-driven by .t1 .. .t4 on body. -->
+        <g id="upper">
+        <!-- everything above the waist bends slightly with the chop -->
+        <g id="bend">
+
+          <!-- RAYMAN-STYLE rig: NO arms. The fists float in space gripping
+               the haft. #swing-back is intentionally empty (kept so the
+               selector + same-animation pairing in CSS doesn't 404), while
+               the visible fists, handle and axe live in #swing below. The
+               whole "arm origin in middle of body" problem disappears
+               because there ARE no arms — just a hands-and-axe rig that
+               swings as a rigid unit around the chest pivot. -->
+          <g id="swing-back"></g>
+
+          <!-- BODY-STATIC wrapper: shifts the lumberjack body LEFT by 20
+               so the chop has more room and the figure isn't crowded
+               against the stump. The #swing group below is NOT inside
+               this wrapper — it stays at its world coords so the axe
+               keeps biting into the stump at world x=240. -->
+          <g class="body-static" transform="translate(-20 0)">
+
+          <!-- belt -->
+          <rect x="148" y="338" width="72" height="12" fill="#4A2E18"/>
+          <rect x="180" y="339" width="8"  height="10" fill="#D4B255"/>
+
+          <!-- torso (plaid shirt) — neckline is a small dip at the top
+               so the head sits in it naturally -->
+          <path d="M140 240
+                   Q140 232 150 232
+                   L172 232
+                   Q182 238 192 232
+                   L214 232
+                   Q224 232 224 240
+                   L224 340
+                   L140 340 Z" fill="url(#plaid)"
+                stroke="#3A0F08" stroke-width="0.6" stroke-linejoin="round"/>
+          <!-- shirt shadow -->
+          <path d="M140 240 Q140 232 150 232 L168 232 L168 340 L140 340 Z"
+                fill="#000" opacity="0.12"/>
+
+          <!-- (shoulder caps removed per user request) -->
+
+          <!-- shirt buttons -->
+          <circle cx="182" cy="252" r="1.6" fill="#2A0F0A"/>
+          <circle cx="182" cy="272" r="1.6" fill="#2A0F0A"/>
+          <circle cx="182" cy="292" r="1.6" fill="#2A0F0A"/>
+          <circle cx="182" cy="312" r="1.6" fill="#2A0F0A"/>
+
+          <!-- head -->
+          <g id="head">
+            <!-- neck -->
+            <rect x="172" y="222" width="20" height="14" fill="#E8B888"/>
+            <!-- face -->
+            <ellipse cx="182" cy="200" rx="32" ry="34" fill="#E8B888"/>
+            <!-- ear -->
+            <ellipse cx="151" cy="202" rx="4" ry="6" fill="#D89E72"/>
+            <!-- GOATEE — small chin patch UNDER the mouth. Mouth always sits
+                 above it on the face skin, so we don't need a skin "window"
+                 in the middle of a big beard. Width is narrow but visible
+                 (the user wanted "wider so the mouth would always be in
+                 the middle of it" — the goatee solves this by sitting
+                 below the mouth, framing it from the chin up). -->
+            <path d="M170 224
+                     Q172 234 182 240
+                     Q192 234 194 224
+                     Q188 226 182 226
+                     Q176 226 170 224 Z"
+                  fill="#7A4F2B"
+                  stroke="#3A2010" stroke-width="0.9" stroke-linejoin="round"/>
+            <!-- inner shadow on the goatee -->
+            <path d="M173 226 Q176 236 182 240 Q188 236 191 226
+                     Q186 240 182 240 Q178 240 173 226 Z"
+                  fill="#5C3A1E" opacity="0.55"/>
+            <!-- goatee strand divisions -->
+            <path d="M178 228 Q179 234 180 240" fill="none" stroke="#3A2010" stroke-width="0.7" opacity="0.75"/>
+            <path d="M186 228 Q185 234 184 240" fill="none" stroke="#3A2010" stroke-width="0.7" opacity="0.75"/>
+            <!-- tuft endings (chin point) -->
+            <circle cx="181" cy="241" r="1.4" fill="#5C3A1E"/>
+            <circle cx="184" cy="240" r="1.4" fill="#5C3A1E"/>
+
+            <!-- Moustache: classic handlebar with philtrum dip on top,
+                 ends curling DOWN at the corners. Strand lines give it
+                 hair texture so it can never read as another mouth.
+                 Wider + thicker than the smile, and color is differentiated
+                 (warmer brown) from the near-black mouth stroke. -->
+            <g class="moustache">
+              <path d="M168 213
+                       Q174 210 179 212
+                       L182 215
+                       L185 212
+                       Q190 210 196 213
+                       Q197 218 192 218
+                       Q188 217 185 216
+                       Q183 217 182 216
+                       Q181 217 179 216
+                       Q176 217 172 218
+                       Q167 218 168 213 Z"
+                    fill="#5C3A1E" stroke="#2A1810" stroke-width="0.5"/>
+              <!-- hair strand texture -->
+              <path d="M173 214 L173 217" stroke="#2A1810" stroke-width="0.5" opacity="0.75"/>
+              <path d="M177 214 L177 217" stroke="#2A1810" stroke-width="0.5" opacity="0.75"/>
+              <path d="M187 214 L187 217" stroke="#2A1810" stroke-width="0.5" opacity="0.75"/>
+              <path d="M191 214 L191 217" stroke="#2A1810" stroke-width="0.5" opacity="0.75"/>
+              <!-- center highlight (philtrum suggestion) -->
+              <path d="M182 213 L182 215" stroke="#7A4F2B" stroke-width="0.7" opacity="0.8"/>
+            </g>
+
+            <!-- eyebrows -->
+            <g class="brows">
+              <path class="brow" d="M163 178 Q170 174 178 178" fill="none" stroke="#3A2010" stroke-width="2.4" stroke-linecap="round"/>
+              <path class="brow" d="M186 178 Q194 174 201 178" fill="none" stroke="#3A2010" stroke-width="2.4" stroke-linecap="round"/>
+            </g>
+
+            <!-- eyebags (hidden until tired) -->
+            <g class="eyebags">
+              <path d="M165 191 Q171 194 177 191" fill="none" stroke="#6F4A2E" stroke-width="1.4" stroke-linecap="round"/>
+              <path d="M187 191 Q193 194 199 191" fill="none" stroke="#6F4A2E" stroke-width="1.4" stroke-linecap="round"/>
+            </g>
+
+            <!-- eyes: visible whites + pupils + highlight, dark outline -->
+            <g class="eyes">
+              <g class="eye left">
+                <ellipse cx="171" cy="188" rx="4.5" ry="4.8" fill="#FFFAEC"
+                         stroke="#3A2010" stroke-width="0.9"/>
+                <ellipse cx="172" cy="188" rx="2.4" ry="2.8" fill="#1B1208"/>
+                <circle  cx="172.8" cy="186.6" r="1" fill="#FFFFFF"/>
+              </g>
+              <g class="eye right">
+                <ellipse cx="193" cy="188" rx="4.5" ry="4.8" fill="#FFFAEC"
+                         stroke="#3A2010" stroke-width="0.9"/>
+                <ellipse cx="194" cy="188" rx="2.4" ry="2.8" fill="#1B1208"/>
+                <circle  cx="194.8" cy="186.6" r="1" fill="#FFFFFF"/>
+              </g>
+              <!-- eyelid covers — anchored at the top of each eye and grow
+                   downward via .t3 / .t4 height changes in CSS -->
+              <rect class="lid" x="166" y="183" width="12" height="0" fill="#E8B888"/>
+              <rect class="lid" x="188" y="183" width="12" height="0" fill="#E8B888"/>
+            </g>
+
+            <!-- nose -->
+            <path d="M180 192 Q178 200 182 204 Q186 200 184 192 Z" fill="#D89E72"/>
+
+            <!-- mouth: smile (default) — sits inside the mouth zone -->
+            <path class="mouth-smile" d="M176 220 Q182 224 188 220"
+                  fill="none" stroke="#3A2010" stroke-width="2" stroke-linecap="round"/>
+            <!-- mouth: panting / open (tired) -->
+            <ellipse class="mouth-pant" cx="182" cy="221" rx="5" ry="3" fill="#3A2010"/>
+            <!-- tongue (zombie-tired): exits the mouth opening DOWN, with
+                 a clear lighter highlight up the middle. Length tuned so it
+                 hangs out cleanly without dipping deep into beard area. -->
+            <path class="tongue"
+                  d="M179 222 Q178 230 184 231 Q188 230 186 222 Z"
+                  fill="#D26A6A" stroke="#A04848" stroke-width="0.6"/>
+            <path class="tongue-hi" d="M183 224 L183 229" stroke="#E89090"
+                  stroke-width="0.7" opacity="0.8"/>
+
+            <!-- beanie with knit ribbing -->
+            <path d="M148 178
+                     Q150 152 182 150
+                     Q214 152 216 178
+                     Q216 184 210 184
+                     L154 184
+                     Q148 184 148 178 Z" fill="#A82A20"
+                  stroke="#5A140C" stroke-width="0.8"/>
+            <!-- knit rib lines -->
+            <path d="M158 156 L156 184" fill="none" stroke="#7A1810" stroke-width="0.9" opacity="0.7"/>
+            <path d="M170 152 L168 184" fill="none" stroke="#7A1810" stroke-width="0.9" opacity="0.7"/>
+            <path d="M182 150 L182 184" fill="none" stroke="#7A1810" stroke-width="0.9" opacity="0.7"/>
+            <path d="M194 152 L196 184" fill="none" stroke="#7A1810" stroke-width="0.9" opacity="0.7"/>
+            <path d="M206 156 L208 184" fill="none" stroke="#7A1810" stroke-width="0.9" opacity="0.7"/>
+            <!-- folded brim -->
+            <rect x="152" y="180" width="60" height="6" rx="2" fill="#7A1810"
+                  stroke="#3A0F08" stroke-width="0.5"/>
+            <!-- pom-pom with stitched cross hatches -->
+            <circle cx="182" cy="146" r="7" fill="#E8C8A0"
+                    stroke="#A07248" stroke-width="0.7"/>
+            <path d="M177 146 L187 146" stroke="#A07248" stroke-width="0.6"/>
+            <path d="M182 141 L182 151" stroke="#A07248" stroke-width="0.6"/>
+            <path d="M178 142 L186 150" stroke="#A07248" stroke-width="0.5" opacity="0.7"/>
+          </g>
+
+          </g><!-- /body-static -->
+
+          <!-- The chop rig — RAYMAN STYLE.
+               No arms. Two floating fists grip a HORIZONTAL haft. The axe
+               head is mounted T-perpendicular to the haft (NOT at the end
+               of the stick), so the haft visibly extends past the head and
+               the blade hangs straight down from the mount point.
+
+               Geometry drawn at the IMPACT pose (rotation = 0):
+                 chest pivot          (180, 254)   — swing rotates here
+                 handle butt          (140, 358)   — left end of haft
+                 handle direction     horizontal (0deg) at impact
+                 handle length        130          — extends past the head
+                 back fist grip       (160, 358)   — handle local x = 20
+                 front fist grip      (220, 358)   — handle local x = 80
+                 axe head mount       (240, 358)   — handle local x = 100
+                 handle tip (T-knob)  (270, 358)   — 30 past the head
+                 cutting edge tip     (240, 400)   — bites INTO the stump
+
+               At windup (rotation -110deg), this whole rigid assembly
+               rotates around the chest pivot — the fists, haft and head
+               all swing up-and-back as one unit. -->
+          <g id="swing">
+            <!-- HAFT: horizontal stick from butt (125,358) to tip (250,358).
+                 Length 125 — shorter, with the head riding closer to the
+                 end of the stick. Only ~10 units of haft visible past the
+                 head as the T-knob (per "move toward end of the stick"). -->
+            <g transform="translate(125 358)">
+              <rect x="0" y="-3.5" width="125" height="7"   rx="3"   fill="#7A4F2B"
+                    stroke="#3F2614" stroke-width="0.8"/>
+              <rect x="0" y="-3"   width="125" height="1.6" rx="0.8" fill="#A07248" opacity="0.7"/>
+              <rect x="0" y="1.4"  width="125" height="1.6" rx="0.8" fill="#3F2614" opacity="0.55"/>
+              <path d="M15 -1 Q35 -1.5 55 -1" stroke="#5C3A1E" stroke-width="0.4" fill="none" opacity="0.5"/>
+              <path d="M65 1 Q85 0.5 105 1"   stroke="#5C3A1E" stroke-width="0.4" fill="none" opacity="0.5"/>
+            </g>
+            <!-- handle butt cap (left end) -->
+            <ellipse cx="125" cy="358" rx="3" ry="5" fill="#3F2614"/>
+            <ellipse cx="124" cy="358" rx="1.5" ry="3" fill="#5C3A1E"/>
+
+            <!-- BACK fist (left): floating cartoon hand, gripping the haft. -->
+            <g transform="translate(140 358)">
+              <!-- palm body -->
+              <ellipse cx="0" cy="0" rx="11" ry="9" fill="#E8B888"
+                       stroke="#2A1810" stroke-width="1.6"/>
+              <!-- three knuckle bumps along the top edge -->
+              <path d="M-7 -7 Q-5 -10 -2 -8 Q1 -10 4 -8 Q7 -10 9 -7"
+                    fill="#E8B888" stroke="#2A1810" stroke-width="1.4"
+                    stroke-linejoin="round"/>
+              <!-- thumb: chunky oval angled forward over the haft -->
+              <ellipse cx="9" cy="-2" rx="4" ry="5" fill="#E8B888"
+                       stroke="#2A1810" stroke-width="1.4"
+                       transform="rotate(20 9 -2)"/>
+              <!-- knuckle creases (small detail lines) -->
+              <path d="M-3 -6 L-3 -3" stroke="#2A1810" stroke-width="0.8"/>
+              <path d="M1  -7 L1  -3" stroke="#2A1810" stroke-width="0.8"/>
+              <path d="M5  -7 L5  -3" stroke="#2A1810" stroke-width="0.8"/>
+              <!-- thumb-base crease -->
+              <path d="M5 -2 Q8 0 6 4" fill="none"
+                    stroke="#2A1810" stroke-width="1"/>
+            </g>
+
+            <!-- FRONT fist (right): same stylized hand, slightly larger
+                 because it's "closer to the viewer". -->
+            <g transform="translate(200 358) scale(1.15)">
+              <ellipse cx="0" cy="0" rx="11" ry="9" fill="#E8B888"
+                       stroke="#2A1810" stroke-width="1.6"/>
+              <path d="M-7 -7 Q-5 -10 -2 -8 Q1 -10 4 -8 Q7 -10 9 -7"
+                    fill="#E8B888" stroke="#2A1810" stroke-width="1.4"
+                    stroke-linejoin="round"/>
+              <ellipse cx="9" cy="-2" rx="4" ry="5" fill="#E8B888"
+                       stroke="#2A1810" stroke-width="1.4"
+                       transform="rotate(20 9 -2)"/>
+              <path d="M-3 -6 L-3 -3" stroke="#2A1810" stroke-width="0.8"/>
+              <path d="M1  -7 L1  -3" stroke="#2A1810" stroke-width="0.8"/>
+              <path d="M5  -7 L5  -3" stroke="#2A1810" stroke-width="0.8"/>
+              <path d="M5 -2 Q8 0 6 4" fill="none"
+                    stroke="#2A1810" stroke-width="1"/>
+            </g>
+
+            <!-- AXE HEAD: redesigned DIRECTLY for the vertical T-mount.
+                 The previous version was the older horizontal shape rotated
+                 90deg, which made the silhouette feel rotated rather than
+                 drawn for this orientation. This new path is authored
+                 natively top-down:
+                   - flat POLL across the top (handle exits here)
+                   - asymmetric chunky BODY that widens forward as it falls
+                   - smooth CUTTING EDGE curve sweeping along the front
+                   - pronounced BEARD HOOK protruding on the back side
+                 Cutting-edge tip at local (4, 38) → world (244, 396),
+                 which bites about 8 units into the top of the stump. -->
+            <g transform="translate(240 358)">
+              <!-- haft wedge visible peeking through the top of the head -->
+              <rect x="-2.5" y="-16" width="5" height="4" rx="0.6" fill="#5C3A1E"/>
+              <rect x="-2.5" y="-16" width="5" height="1.4" rx="0.5" fill="#7A4F2B"/>
+
+              <!-- POLL + BLADE BODY: chunky asymmetric felling-axe shape -->
+              <path d="M-8 -12
+                       L8 -12
+                       L9 -4
+                       L14 4
+                       L18 18
+                       Q16 32 6 38
+                       L-8 38
+                       Q-18 36 -19 24
+                       L-15 12
+                       L-11 -4
+                       L-8 -12 Z"
+                    fill="#B5BCC2" stroke="#3A4148" stroke-width="1.6"
+                    stroke-linejoin="round"/>
+
+              <!-- BRIGHT CUTTING EDGE: the polished sweep along the front
+                   side, curving into the bottom tip. -->
+              <path d="M14 4
+                       L18 18
+                       Q16 32 6 38
+                       L-2 38
+                       Q8 32 10 20
+                       L8 4 Z"
+                    fill="#E5E9EC"/>
+
+              <!-- BEARD HOOK shadow: darker on the back protrusion so it
+                   reads as a distinct geometric feature. -->
+              <path d="M-19 24 L-15 12 L-11 -4 L-15 -4 L-17 12 Z"
+                    fill="#000" opacity="0.16"/>
+
+              <!-- top shadow on the upper poll (under the haft) -->
+              <path d="M-8 -12 L8 -12 L9 -4 L4 -7 L-4 -7 L-8 -4 Z"
+                    fill="#000" opacity="0.2"/>
+
+              <!-- the EYE (where the haft passes through) -->
+              <ellipse cx="0" cy="-6" rx="3" ry="2.6" fill="#2A1810"/>
+              <!-- visible wood wedge inside the eye -->
+              <ellipse cx="0" cy="-6" rx="1.4" ry="1.4" fill="#7A4F2B"/>
+
+              <!-- cast-metal scratch detail -->
+              <path d="M-5 10 L9 14"  stroke="#7A8088" stroke-width="0.6" opacity="0.7"/>
+              <path d="M-3 22 L8 26"  stroke="#7A8088" stroke-width="0.5" opacity="0.6"/>
+            </g>
+          </g>
+        </g>
+        </g><!-- /upper -->
+
+        <!-- sweat drops (over head, hidden until tired) — shifted -20 to
+             follow the body. -->
+        <g id="sweat">
+          <path class="drop d1" d="M130 168 Q126 176 130 178 Q134 176 130 168 Z" fill="#7EC8E3"/>
+          <path class="drop d2" d="M194 172 Q190 180 194 182 Q198 180 194 172 Z" fill="#7EC8E3"/>
+          <path class="drop d3" d="M178 158 Q174 166 178 168 Q182 166 178 158 Z" fill="#7EC8E3"/>
+        </g>
+
+        <!-- floating Z's (only at high exhaustion) — shifted -20. -->
+        <g id="zzz">
+          <text class="z z1" x="200" y="150">z</text>
+          <text class="z z2" x="212" y="130">z</text>
+          <text class="z z3" x="224" y="108">Z</text>
+        </g>
+
+        <!-- speech bubble — funny line that swaps with exhaustion -->
+        <g id="bubble" aria-hidden="true">
+          <path d="M250 96
+                   Q250 80 268 80
+                   L412 80
+                   Q430 80 430 96
+                   L430 130
+                   Q430 146 412 146
+                   L292 146
+                   L278 162
+                   L284 146
+                   L268 146
+                   Q250 146 250 130 Z"
+                fill="#FFFFFF" stroke="#2A2A2A" stroke-width="2"/>
+          <text id="bubble-text" x="340" y="118" text-anchor="middle">timber!</text>
+        </g>
+      </g>
+    </svg>
+
+    <div id="hud">
+      <div class="bar"><div id="bar-fill"></div></div>
+      <div class="meta">
+        <span id="m-tokens">0</span> tokens
+        <span class="dot">·</span>
+        <span id="m-time">0:00</span>
+        <span class="dot">·</span>
+        <span id="m-mood">fresh</span>
+      </div>
+      <!-- TEST CONTROLS: click to force an exhaustion stage. "auto" returns
+           control to the live polling loop. -->
+      <div id="test-controls">
+        <button data-stage="auto" class="active">auto</button>
+        <button data-stage="t0">fresh</button>
+        <button data-stage="t1">warm</button>
+        <button data-stage="t2">work</button>
+        <button data-stage="t3">tired</button>
+        <button data-stage="t4">wrecked</button>
+      </div>
+    </div>
+  </div>
+  <script src="/app.js"></script>
+</body>
+</html>
