@@ -1,5 +1,9 @@
 # chop
 
+<img width="741" height="747" alt="Screenshot 2026-05-07 at 9 07 13 PM" src="https://github.com/user-attachments/assets/503331eb-a67d-4b2a-b92f-d1ec8c4bd9f7" />
+
+
+
 A cartoon lumberjack window for [Claude Code](https://claude.com/claude-code).
 Chops wood at a steady pace while your session runs. Looks visibly more wrecked
 the longer you go and the more tokens you burn — but **never slows down**. Logs
